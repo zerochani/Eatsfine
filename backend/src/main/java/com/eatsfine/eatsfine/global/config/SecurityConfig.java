@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Duration;
 import java.util.List;
@@ -90,26 +91,24 @@ public class SecurityConfig {
                                                 .successHandler(customOAuth2SuccessHandler)
                                                 .failureHandler(customOAuth2FailureHandler))
 
-                        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-            return http.build();
-    }
+                return http.build();
+        }
 
         @Bean
         public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
                 return new HttpCookieOAuth2AuthorizationRequestRepository();
         }
 
+        @Value("${app.cors.allowed-origins}")
+        private List<String> allowedOrigins;
+
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration config = new CorsConfiguration();
 
-                // Merged origins from both remote and local
-                config.setAllowedOriginPatterns(List.of(
-                                "https://www.eatsfine.co.kr",
-                                "https://eatsfine.co.kr",
-                                "http://localhost:3000",
-                                "http://localhost:5173"));
+                config.setAllowedOriginPatterns(allowedOrigins);
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setExposedHeaders(List.of("Authorization", "Set-Cookie"));

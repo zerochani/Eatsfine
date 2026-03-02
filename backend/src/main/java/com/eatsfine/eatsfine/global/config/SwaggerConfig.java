@@ -8,11 +8,15 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
+
+        @Value("${app.swagger.server-url}")
+        private String serverUrl;
 
         @Bean
         public OpenAPI openAPI() {
@@ -25,7 +29,7 @@ public class SwaggerConfig {
                                                 .version("1.0.0"))
 
                                 .servers(List.of(
-                                                new Server().url("https://eatsfine.co.kr").description("Production"),
+                                                new Server().url(serverUrl).description("Server"),
                                                 new Server().url("http://localhost:8080").description("Local")))
 
                                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))

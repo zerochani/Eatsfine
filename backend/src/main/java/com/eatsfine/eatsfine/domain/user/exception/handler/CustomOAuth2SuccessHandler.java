@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.Map;
@@ -38,13 +39,16 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthCookieProvider authCookieProvider;
 
-    private static final String CALLBACK_REDIRECT_BASE = "https://www.eatsfine.co.kr/oauth/callback";
-    private static final String LOGIN_ERROR_REDIRECT_BASE = "https://www.eatsfine.co.kr/login/error";
+    @Value("${app.oauth2.redirect.success-base}")
+    private String callbackRedirectBase;
+
+    @Value("${app.oauth2.redirect.failure-base}")
+    private String loginErrorRedirectBase;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+            HttpServletResponse response,
+            Authentication authentication) throws IOException {
 
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         String provider = oauthToken.getAuthorizedClientRegistrationId(); // google, kakao
@@ -99,7 +103,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         log.info("[OAuth2 SUCCESS] 새 refreshToken 쿠키 설정: {}", refreshToken);
         log.info("[OAuth2 SUCCESS] 쿠키 설정 내용: {}", refreshCookie.toString());
 
-        String redirectUrl = UriComponentsBuilder.fromUriString(CALLBACK_REDIRECT_BASE)
+        String redirectUrl = UriComponentsBuilder.fromUriString(callbackRedirectBase)
                 .queryParam("accessToken", accessToken)
                 .build()
                 .toUriString();
@@ -110,7 +114,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
     private void redirectFail(HttpServletResponse response, BaseErrorCode errorStatus) throws IOException {
         ErrorReasonDto reason = errorStatus.getReason();
-        String failUrl = UriComponentsBuilder.fromUriString(LOGIN_ERROR_REDIRECT_BASE)
+        String failUrl = UriComponentsBuilder.fromUriString(loginErrorRedirectBase)
                 .queryParam("error", reason.getCode())
                 .queryParam("message", reason.getMessage())
                 .build()
@@ -139,7 +143,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private String extractSocialId(SocialType socialType, Map<String, Object> attributes) {
         if (socialType == SocialType.GOOGLE) {
             Object sub = attributes.get("sub");
-            if (sub != null) return String.valueOf(sub);
+            if (sub != null)
+                return String.valueOf(sub);
 
             // fallback
             Object id = attributes.get("id");
@@ -169,7 +174,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         log.warn("[KAKAO] has_email={}, email_needs_agreement={}, is_email_valid={}, is_email_verified={}",
                 hasEmail, emailNeedsAgreement, isEmailValid, isEmailVerified);
-
 
         Object profileObj = kakaoAccount.get("profile");
         if (profileObj instanceof Map<?, ?> profile) {
