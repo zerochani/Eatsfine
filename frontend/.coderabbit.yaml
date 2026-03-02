@@ -1,0 +1,26 @@
+language: "ko-KR"
+tone_instructions: "한국어로, 팀원에게 말하듯 친절하게. 버그/안정성/접근성/성능/구조 위주로 리뷰해줘. 문제는 근거+대안(예시 코드)이 있으면 함께."
+reviews:
+  profile: "chill"
+  high_level_summary: true
+  poem: true
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "src/**"
+    - ".coderabbit.yaml"
+    - "!dist/**"
+    - "!build/**"
+    - "!coverage/**"
+    - "!**/*.lock"
+    - "!pnpm-lock.yaml"
+  path_instructions:
+    - path: "src/components/**"
+      instructions: "컴포넌트는 단일 책임, props 타입/네이밍 명확히, 접근성(aria) 체크."
+    - path: "src/pages/**"
+      instructions: "라우팅/레이아웃 영향, 로딩/에러/empty 상태 UX 확인."
+    - path: "src/hooks/**"
+      instructions: "의존성 배열(useEffect) 정확성, 불필요한 re-render/메모이제이션 남발 금지."
+    - path: "src/api/**"
+      instructions: "에러 처리/타임아웃/리트라이 전략 확인, 응답 타입 안전성 유지."

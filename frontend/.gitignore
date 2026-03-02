@@ -1,0 +1,36 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+#dependencies
+node_modules/
+
+#env
+.env
+.env.*
+!.env.example
+# (.env랑 .env.local 같은 애들은 다무시(.env.*) 근데 .env.example은 공유용으로 추적허용함) 
+
+
+#build
+dist/
